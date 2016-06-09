@@ -1,5 +1,5 @@
 {
-  "name": "react-PouchDB",
+  "name": "react_pouch",
   "version": "1.0.0",
   "description": "react PouchDB",
   "main": "index.html",
@@ -26,6 +26,7 @@
     "react": "^15.0.2",
     "react-addons-update": "^15.0.2",
     "react-dom": "^15.0.2",
-    "react-router": "^2.4.0"
+    "react-router": "^2.4.0",
+    "underscore": "^1.8.3"
   }
 }
