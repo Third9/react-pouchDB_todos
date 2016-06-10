@@ -4,7 +4,6 @@ class TodoItem extends React.Component {
   constructor(props) {
     super(props);
 
-    this.todo = this.props.todo;
     this.handleCheckbox = this.handleCheckbox.bind(this);
     this.todoDbClicked = this.todoDbClicked.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
@@ -12,51 +11,91 @@ class TodoItem extends React.Component {
     this.todoBlurred = this.todoBlurred.bind(this);
   }
 
-  handleCheckbox() {
-    let todo = this.todo;
+  handleCheckbox(event) {
+    let todo = this.props.todo;
+    let refTodo = this.refs.todo;
+
+    todo.completed = event.target.checked;
+    refTodo.className = event.target.checked ? 'completed': 'none';
+    this.props.fnc.handleCreateUpdateDB(todo);
   }
 
   todoDbClicked() {
-    let todo = this.todo;
+    let refTodo = this.refs.todo;
+    let refTitle = this.refs.todoTitle;
+
+    refTodo.className = 'editing';
+    refTitle.focus();
   }
 
   handleDelete() {
-    let todo = this.todo;
+    let todo = this.props.todo;
+    this.props.fnc.handleDeleteDB(todo);
   }
 
-  todoKeyPressed() {
-    let todo = this.todo;
+  todoBlurred(todo) {
+      let trimmedText = todo.title;
+      if(!trimmedText) {
+        this.props.fnc.handleDeleteDB(todo);
+      }else {
+        todo.title = trimmedText;
+        this.props.fnc.handleCreateUpdateDB(todo)
+      }
   }
 
-  todoBlurred() {
-    let todo = this.todo;
+  todoKeyPressed(event) {
+    let todo = this.props.todo;
+    let refTodo = this.refs.todo;
+
+    if (event.key === 'Enter') {
+      let title = event.target.value.trim()
+      todo.title = title
+      refTodo.className = event.target.checked ? 'completed': 'none';
+
+      this.todoBlurred(todo);
+    }
   }
+
+  componentDidMount(){
+    let refTodo = this.refs.todo;
+    let refTitle = this.refs.todoTitle;
+
+    refTodo.className = this.props.todo.completed ? 'completed': 'none';
+    refTitle.value = this.props.todo.title;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    let refTodo = this.refs.todo;
+    let refTitle = this.refs.todoTitle;
+
+    refTodo.className = this.props.todo.completed ? 'completed': 'none';
+    refTitle.value = this.props.todo.title;
+  }
+
 
   render() {
-    let todoId = `li_${this.todo._id}`;
-    let inputId = `input_${this.todo._id}`;
+    let todoId = `li_${this.props.todo._id}`;
+    let inputId = `input_${this.props.todo._id}`;
 
     return(
-      <li id={todoId}
-          className= {this.todo.completed ?
-                          'completed'
-                          : null
-          }
+      <li ref="todo"
+          key={todoId}
+          id={todoId}
       >
-        <div className='view'>
+        <div className='view' >
           <input className='toggle'
                  type='checkbox'
                  onChange={this.handleCheckbox}
-                 checked={this.todo.completed ? true:false}
+                 checked={this.props.todo.completed ? true:false}
           />
-          <label onDoubleClick={this.todoDbClicked}>{this.todo.title}</label>
+          <label onDoubleClick={this.todoDbClicked}>{this.props.todo.title}</label>
           <button className='destroy'
                   onClick={this.handleDelete}
           />
         </div>
-        <input id={inputId}
+        <input ref="todoTitle"
+               id={inputId}
                className='edit'
-               value={this.todo.title}
                onKeyPress={this.todoKeyPressed}
                onBlur={this.todoBlurred}
         />

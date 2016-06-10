@@ -17,7 +17,9 @@ class TodoList extends React.Component {
          <ul id="todo-list">
           {
             this.props.todos.map((todo)=>{
-              return (<TodoItem todo={todo}/>)
+              return (<TodoItem todo={todo}
+                                fnc={this.props.fnc}
+                      />)
             })
           }
          </ul>

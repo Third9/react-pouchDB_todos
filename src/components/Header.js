@@ -13,19 +13,22 @@ class Header extends React.Component {
     };
   }
 
-  handleEnter(evt) {
-      if(evt.key === 'Enter') {
-        // this.db.info().then(function(info) {
-        //   console.log(`info: ${info}`);
-        // })
-        this.props.onClick(evt.target.value);
+  handleEnter(event) {
+      if(event.key === 'Enter') {
+        let refNewTodo = this.refs.newTodo;
+        let todo = {
+          _id: new Date().toISOString(),
+          title: event.target.value,
+          completed: false
+        };
+        this.props.onCreate(todo);
+        refNewTodo.value = "";
       }
   }
 
-  handleTodo(evt) {
-      console.log(`evt: ${evt}`);
+  handleTodo(event) {
       this.setState({
-        todoText: evt.target.value
+        todoText: event.target.value
       });
   }
 
@@ -33,7 +36,12 @@ class Header extends React.Component {
     return(
       <header id="header">
          <h1>todos</h1>
-          <input id='new-todo' onKeyPress={this.handleEnter} onChange={this.handleTodo} placeholder="What needs to be done?" autofocus />
+          <input ref='newTodo'
+                 id='new-todo'
+                 onKeyPress={this.handleEnter}
+                 onChange={this.handleTodo}
+                 placeholder="What needs to be done?"
+                 autofocus />
       </header>
     )
   }
