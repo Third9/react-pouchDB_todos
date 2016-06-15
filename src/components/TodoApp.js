@@ -7,23 +7,36 @@ import Header from './Header';
 import TodoList from './TodoList';
 import Footer from './Footer';
 import Info from './Info';
+// import Sync from './sync';
 
 class TodoApp extends React.Component {
   constructor(props){
     super(props);
 
-    this.db = new PouchDB('todos');
+    this.db = new PouchDB('todos', { storage: 'persistent', revs_limit:1 });
+    this.remoteCouch = 'http://admin:kwon0302@127.0.0.1:5984/todos/';
+
     this.showTodos = this.showTodos.bind(this);
     this.updateState = this.updateState.bind(this);
+
+    this.replicateTo = this.replicateTo.bind(this);
+    this.replicateFrom = this.replicateFrom.bind(this);
 
     this.fnc = Object();
     this.fnc.handleCreateUpdateDB = this.handleCreateUpdateDB.bind(this);
     this.fnc.handleDeleteDB = this.handleDeleteDB.bind(this);
 
     this.state = {
-      remoteCouch: false,
       todos: []
     };
+  }
+
+  replicateTo(opts, syncError) {
+    this.db.replicate.to(this.remoteCouch, opts, syncError);
+  }
+
+  replicateFrom(opts, syncError) {
+    this.db.replicate.from(this.remoteCouch, opts, syncError);
   }
 
   handleCreateUpdateDB(todo){
@@ -59,6 +72,7 @@ class TodoApp extends React.Component {
 
   componentDidMount(){
     this.showTodos();
+    // this.sync();
   }
 
   componentDidUpdate(nextProps, nextState) {
@@ -82,7 +96,9 @@ class TodoApp extends React.Component {
           <TodoList todos={this.state.todos}
                     fnc={this.fnc}
           />
-          <Footer />
+          <Footer onReplicateTo={this.replicateTo}
+                  onReplicateFrom={this.replicateFrom}
+          />
         </section>
         <Info />
       </div>
